@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using SldWorks;
 using SolidworksDemos.Interfaces;
 
@@ -7,7 +8,14 @@ public class SolidWorksService : ISolidWorksService
 {
     public bool CreateSolidworksInstance(out SldWorks.SldWorks swApp, out string message)
     {
-        swApp = new SldWorks.SldWorks();
+        try
+        {
+            swApp = (SldWorks.SldWorks)Marshal.GetActiveObject("SldWorks.Application");
+        }
+        catch
+        {
+            swApp = new SldWorks.SldWorks();
+        }
 
         if (swApp == null)
         {
