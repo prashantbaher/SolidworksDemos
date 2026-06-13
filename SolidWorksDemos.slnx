@@ -1,4 +1,3 @@
 <Solution>
-  <Project Path="SolidWorksApiLib/SolidWorksApiLib.csproj" />
-  <Project Path="SolidWorksTui/SolidWorksTui.csproj" />
+  <Project Path="SolidworksDemos/SolidworksDemos.csproj" />
 </Solution>
