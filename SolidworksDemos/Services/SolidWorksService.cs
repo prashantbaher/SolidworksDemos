@@ -1,13 +1,13 @@
-using SolidWorks.Interop.sldworks;
+using SldWorks;
 using SolidworksDemos.Interfaces;
 
 namespace SolidworksDemos.Services;
 
 public class SolidWorksService : ISolidWorksService
 {
-    public bool CreateSolidworksInstance(out SldWorks swApp, out string message)
+    public bool CreateSolidworksInstance(out SldWorks.SldWorks swApp, out string message)
     {
-        swApp = new SldWorks();
+        swApp = new SldWorks.SldWorks();
 
         if (swApp == null)
         {
@@ -20,7 +20,7 @@ public class SolidWorksService : ISolidWorksService
         return true;
     }
 
-    public bool GetActiveDocument(SldWorks swApp, out ModelDoc2 swDoc, out string message)
+    public bool GetActiveDocument(SldWorks.SldWorks swApp, out ModelDoc2 swDoc, out string message)
     {
         swDoc = (ModelDoc2)swApp.ActiveDoc;
 
