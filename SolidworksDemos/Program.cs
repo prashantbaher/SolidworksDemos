@@ -9,4 +9,9 @@ app.Configure(config =>
         .WithDescription("Say hello to someone");
 });
 
-return app.Run(args.Length == 0 ? ["hello"] : args);
+if (args.Length == 0)
+{
+    args = ["hello"];
+}
+
+return app.Run(args);
