@@ -10,7 +10,7 @@ public static class ActionFactory
     {
         return (category, topic, variant) switch
         {
-            (Menu.Sketches, Menu.Line, Menu.Create) => new Sketches.CreateLine(),
+            (Menu.Sketches, Menu.Line, Menu.Create) => new Sketches.CreateLine(new Helpers.SwHelper()),
             _ => throw new NotSupportedException($"No action for {category} > {topic} > {variant}")
         };
     }

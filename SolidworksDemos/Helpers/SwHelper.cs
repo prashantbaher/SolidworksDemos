@@ -4,9 +4,9 @@ using SolidworksDemos.Interfaces;
 
 namespace SolidworksDemos.Helpers;
 
-public static class SwHelper
+public class SwHelper : ISwHelper
 {
-    public static SldWorks.SldWorks CreateSwInstance()
+    public SldWorks.SldWorks CreateSwInstance()
     {
         SldWorks.SldWorks swApp = new SldWorks.SldWorks();
 
@@ -17,7 +17,7 @@ public static class SwHelper
         return swApp;
     }
 
-    public static ModelDoc2 CreatePartDocument(SldWorks.SldWorks swApp)
+    public ModelDoc2 CreatePartDocument(SldWorks.SldWorks swApp)
     {
         string template = swApp.GetUserPreferenceStringValue(
             (int)swUserPreferenceStringValue_e.swDefaultTemplatePart);
@@ -33,7 +33,7 @@ public static class SwHelper
         return swDoc;
     }
 
-    public static bool SelectPlaneAndInsertSketch(ModelDoc2 swDoc)
+    public bool SelectPlaneAndInsertSketch(ModelDoc2 swDoc)
     {
         bool selected = swDoc.Extension.SelectByID2(
             "Right Plane", "PLANE", 0, 0, 0, false, 0, null,
@@ -46,7 +46,7 @@ public static class SwHelper
         return true;
     }
 
-    public static double GetLengthConversionFactor(ModelDoc2 swDoc)
+    public double GetLengthConversionFactor(ModelDoc2 swDoc)
     {
         var lengthUnit = (swLengthUnit_e)swDoc.LengthUnit;
 
@@ -60,7 +60,7 @@ public static class SwHelper
         }
     }
 
-    public static (double, double, double) ApplyUnitConversion(
+    public (double, double, double) ApplyUnitConversion(
         IPointViewModel inputPoint, double lengthConversionFactor)
     {
         double x = inputPoint.XPoint * lengthConversionFactor;
@@ -69,7 +69,7 @@ public static class SwHelper
         return (x, y, z);
     }
 
-    public static void CleanupAndExit(SldWorks.SldWorks swApp)
+    public void CleanupAndExit(SldWorks.SldWorks swApp)
     {
         swApp.CloseAllDocuments(true);
         swApp.ExitApp();

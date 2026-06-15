@@ -10,6 +10,17 @@ namespace SolidworksDemos.Sketches;
 
 public class CreateLine : ICrudAction
 {
+    private readonly ISwHelper _swHelper;
+
+    public CreateLine() : this(new SwHelper())
+    {
+    }
+
+    public CreateLine(ISwHelper swHelper)
+    {
+        _swHelper = swHelper;
+    }
+
     public void Execute()
     {
         double startX = AnsiConsole.Ask<double>("Enter Start Point [green]X[/] (mm):");
@@ -44,30 +55,30 @@ public class CreateLine : ICrudAction
         AnsiConsole.MarkupLine(result);
     }
 
-    private string RunCreateLine(IPointViewModel startPt, IPointViewModel endPt)
+    internal string RunCreateLine(IPointViewModel startPt, IPointViewModel endPt)
     {
-        SldWorks.SldWorks swApp = SwHelper.CreateSwInstance();
+        SldWorks.SldWorks swApp = _swHelper.CreateSwInstance();
         if (swApp == null)
             return "[red]Failed to find SolidWorks application.[/]";
 
-        ModelDoc2 swDoc = SwHelper.CreatePartDocument(swApp);
+        ModelDoc2 swDoc = _swHelper.CreatePartDocument(swApp);
         if (swDoc == null)
             return "[red]Failed to create new part document.[/]";
 
-        if (!SwHelper.SelectPlaneAndInsertSketch(swDoc))
+        if (!_swHelper.SelectPlaneAndInsertSketch(swDoc))
         {
-            SwHelper.CleanupAndExit(swApp);
+            _swHelper.CleanupAndExit(swApp);
             return "[red]Failed to select Right Plane.[/]";
         }
 
-        double factor = SwHelper.GetLengthConversionFactor(swDoc);
-        var (x1, y1, z1) = SwHelper.ApplyUnitConversion(startPt, factor);
-        var (x2, y2, z2) = SwHelper.ApplyUnitConversion(endPt, factor);
+        double factor = _swHelper.GetLengthConversionFactor(swDoc);
+        var (x1, y1, z1) = _swHelper.ApplyUnitConversion(startPt, factor);
+        var (x2, y2, z2) = _swHelper.ApplyUnitConversion(endPt, factor);
 
         SketchSegment segment = swDoc.SketchManager.CreateLine(x1, y1, z1, x2, y2, z2);
         if (segment == null)
         {
-            SwHelper.CleanupAndExit(swApp);
+            _swHelper.CleanupAndExit(swApp);
             return "[red]Failed to create sketch line.[/]";
         }
 
