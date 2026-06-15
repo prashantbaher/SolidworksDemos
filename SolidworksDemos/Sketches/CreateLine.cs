@@ -1,6 +1,7 @@
 using Spectre.Console;
 using SldWorks;
 using SolidworksDemos.Abstractions;
+using SolidworksDemos.Constants;
 using SolidworksDemos.Helpers;
 using SolidworksDemos.Interfaces;
 using SolidworksDemos.Models;
@@ -32,25 +33,31 @@ public class CreateLine : ICrudAction
             ZPoint = 0
         };
 
+        string result = "";
+
+        AnsiConsole.Status()
+            .Start(Menu.ProcessingMessage, ctx =>
+            {
+                result = RunCreateLine(startPt, endPt);
+            });
+
+        AnsiConsole.MarkupLine(result);
+    }
+
+    private string RunCreateLine(IPointViewModel startPt, IPointViewModel endPt)
+    {
         SldWorks.SldWorks swApp = SwHelper.CreateSwInstance();
         if (swApp == null)
-        {
-            AnsiConsole.MarkupLine("[red]Failed to find SolidWorks application.[/]");
-            return;
-        }
+            return "[red]Failed to find SolidWorks application.[/]";
 
         ModelDoc2 swDoc = SwHelper.CreatePartDocument(swApp);
         if (swDoc == null)
-        {
-            AnsiConsole.MarkupLine("[red]Failed to create new part document.[/]");
-            return;
-        }
+            return "[red]Failed to create new part document.[/]";
 
         if (!SwHelper.SelectPlaneAndInsertSketch(swDoc))
         {
             SwHelper.CleanupAndExit(swApp);
-            AnsiConsole.MarkupLine("[red]Failed to select Right Plane.[/]");
-            return;
+            return "[red]Failed to select Right Plane.[/]";
         }
 
         double factor = SwHelper.GetLengthConversionFactor(swDoc);
@@ -61,13 +68,12 @@ public class CreateLine : ICrudAction
         if (segment == null)
         {
             SwHelper.CleanupAndExit(swApp);
-            AnsiConsole.MarkupLine("[red]Failed to create sketch line.[/]");
-            return;
+            return "[red]Failed to create sketch line.[/]";
         }
 
         swDoc.ClearSelection2(true);
         swDoc.ViewZoomtofit2();
 
-        AnsiConsole.MarkupLine("[green]Sketch line successfully created.[/]");
+        return "[green]Sketch line successfully created.[/]";
     }
 }
