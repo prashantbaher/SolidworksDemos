@@ -11,6 +11,8 @@ app.Configure(config =>
         .WithDescription("Say hello to someone");
     config.AddCommand<EditLineCommand>(Constants.Commands.EditLine)
         .WithDescription("Edit a sketch line in SolidWorks");
+    config.AddCommand<CreateLineCommand>(Constants.Commands.CreateLine)
+        .WithDescription("Create a new sketch line in SolidWorks");
 });
 
 if (args.Length == 0)
@@ -22,7 +24,8 @@ if (args.Length == 0)
         var choice = AnsiConsole.Prompt(
             new SelectionPrompt<string>()
                 .Title(Constants.Menu.Title)
-                .AddChoices(Constants.Menu.HelloOption, Constants.Menu.EditLineOption, Constants.Menu.ExitOption));
+                .AddChoices(Constants.Menu.HelloOption, Constants.Menu.EditLineOption,
+                    Constants.Menu.CreateLineOption, Constants.Menu.ExitOption));
 
         if (choice == Constants.Menu.ExitOption)
         {
@@ -36,6 +39,7 @@ if (args.Length == 0)
         {
             _ when choice == Constants.Menu.HelloOption => new[] { Constants.Commands.Hello },
             _ when choice == Constants.Menu.EditLineOption => new[] { Constants.Commands.EditLine },
+            _ when choice == Constants.Menu.CreateLineOption => new[] { Constants.Commands.CreateLine },
             _ => new[] { Constants.Commands.Hello }
         };
 

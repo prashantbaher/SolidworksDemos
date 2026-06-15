@@ -1,13 +1,15 @@
 using Spectre.Console;
 using Spectre.Console.Cli;
 using SolidworksDemos.Interfaces;
-using SolidworksDemos.Services;
 
 namespace SolidworksDemos.Commands;
 
 public class EditLineCommand : Command<EditLineCommand.Settings>
 {
-    private readonly ISolidWorksService _service;
+    private readonly IApplicationService _appService;
+    private readonly IDocumentService _docService;
+    private readonly ISketchService _sketchService;
+    private readonly ILineService _lineService;
 
     public class Settings : CommandSettings
     {
@@ -15,7 +17,10 @@ public class EditLineCommand : Command<EditLineCommand.Settings>
 
     public EditLineCommand()
     {
-        _service = new SolidWorksService();
+        _appService = new Services.ApplicationService();
+        _docService = new Services.DocumentService();
+        _sketchService = new Services.SketchService();
+        _lineService = new Services.LineService();
     }
 
     protected override int Execute(CommandContext context, Settings settings, CancellationToken cancellationToken)
@@ -25,18 +30,18 @@ public class EditLineCommand : Command<EditLineCommand.Settings>
         AnsiConsole.Status()
             .Start(Constants.EditLineMessages.Connecting, ctx =>
             {
-                if (!_service.CreateSolidworksInstance(out var swApp, out messageToShow))
+                if (!_appService.CreateInstance(out var swApp, out messageToShow))
                     return;
 
-                if (!_service.GetActiveDocument(swApp, out var swDoc, out messageToShow))
+                if (!_docService.GetActiveDocument(swApp, out var swDoc, out messageToShow))
                     return;
 
-                if (!_service.GetActiveSketch(swDoc, out var sketch, out messageToShow))
+                if (!_sketchService.GetActiveSketch(swDoc, out var sketch, out messageToShow))
                     return;
 
                 ctx.Status(Constants.EditLineMessages.FindingSketch);
 
-                if (!_service.FindFirstLine(sketch, out var line, out var startPt, out var endPt, out messageToShow))
+                if (!_lineService.FindFirstLine(sketch, out var line, out var startPt, out var endPt, out messageToShow))
                     return;
 
                 var startX = (double)startPt.X;
@@ -59,10 +64,10 @@ public class EditLineCommand : Command<EditLineCommand.Settings>
                 var oldX = pointChoice == Constants.EditLineMessages.StartPoint ? startX : endX;
                 var oldY = pointChoice == Constants.EditLineMessages.StartPoint ? startY : endY;
 
-                if (!_service.UpdateSketchPoint(point, newX, newY, out messageToShow))
+                if (!_lineService.UpdatePoint(point, newX, newY, out messageToShow))
                     return;
 
-                if (!_service.RebuildAndZoom(swDoc, out messageToShow))
+                if (!_docService.RebuildAndZoom(swDoc, out messageToShow))
                     return;
 
                 messageToShow = string.Format(Constants.EditLineMessages.SuccessFormat,
@@ -71,11 +76,13 @@ public class EditLineCommand : Command<EditLineCommand.Settings>
 
         if (!string.IsNullOrEmpty(messageToShow))
         {
-            AnsiConsole.MarkupLine(messageToShow.Contains("Failed") || messageToShow.Contains("failed")
+            var isError = messageToShow.Contains("Failed", StringComparison.OrdinalIgnoreCase);
+            AnsiConsole.MarkupLine(isError
                 ? string.Format(Constants.Errors.FailedFormat, messageToShow)
                 : messageToShow);
+            return isError ? 1 : 0;
         }
 
-        return messageToShow.Contains("Failed") || messageToShow.Contains("failed") ? 1 : 0;
+        return 0;
     }
 }
