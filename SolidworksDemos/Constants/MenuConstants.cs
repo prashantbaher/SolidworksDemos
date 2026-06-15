@@ -21,4 +21,5 @@ public static class Menu
     public const string CategoryPrompt = "Select a Category";
     public const string TopicPrompt = "Select a Topic";
     public const string VariantPrompt = "Select an Operation";
+    public const string ProcessingMessage = "Processing... Please wait";
 }
