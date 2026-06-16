@@ -33,7 +33,7 @@ public static class MenuBuilder
     {
         string[] variants = topic switch
         {
-            Menu.Line => new[] { Menu.Create },
+            Menu.Line => new[] { Menu.Create, Menu.Edit },
             Menu.Point => new[] { Menu.Create },
             _ => Array.Empty<string>()
         };

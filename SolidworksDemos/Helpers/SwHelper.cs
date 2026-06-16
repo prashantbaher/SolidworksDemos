@@ -1,3 +1,5 @@
+using System;
+using System.Runtime.InteropServices;
 using SldWorks;
 using SwConst;
 using SolidworksDemos.Interfaces;
@@ -17,6 +19,18 @@ public class SwHelper : ISwHelper
         return swApp;
     }
 
+    public SldWorks.SldWorks ConnectToRunningInstance()
+    {
+        try
+        {
+            return (SldWorks.SldWorks)Marshal.GetActiveObject("SldWorks.Application");
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     public ModelDoc2 CreatePartDocument(SldWorks.SldWorks swApp)
     {
         string template = swApp.GetUserPreferenceStringValue(
@@ -31,6 +45,11 @@ public class SwHelper : ISwHelper
             return null;
 
         return swDoc;
+    }
+
+    public ModelDoc2 GetActiveDocument(SldWorks.SldWorks swApp)
+    {
+        return (ModelDoc2)swApp.ActiveDoc;
     }
 
     public bool SelectPlaneAndInsertSketch(ModelDoc2 swDoc)

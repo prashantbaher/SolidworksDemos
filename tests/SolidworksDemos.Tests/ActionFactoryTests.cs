@@ -18,6 +18,14 @@ public class ActionFactoryTests
     }
 
     [Fact]
+    public void Create_SketchesLineEdit_ReturnsEditSketchLine()
+    {
+        var action = ActionFactory.Create(Menu.Sketches, Menu.Line, Menu.Edit);
+
+        Assert.IsType<EditSketchLine>(action);
+    }
+
+    [Fact]
     public void Create_InvalidCombination_ThrowsNotSupportedException()
     {
         var ex = Assert.Throws<NotSupportedException>(() =>
