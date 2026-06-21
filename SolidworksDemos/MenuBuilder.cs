@@ -10,22 +10,22 @@ public static class MenuBuilder
     {
         return AnsiConsole.Prompt(
             new SelectionPrompt<string>()
-                .Title($"[yellow]{Menu.CategoryPrompt}[/]")
-                .AddChoices(Menu.Sketches, Menu.PartFeatures, Menu.AssemblyFeatures,
-                    Menu.DrawingFeatures, Menu.EquationManager));
+                .Title($"[yellow]{Menu.Prompts.CategoryPrompt}[/]")
+                .AddChoices(Menu.Documents.Sketches, Menu.Documents.PartFeatures, Menu.Documents.AssemblyFeatures,
+                    Menu.Documents.DrawingFeatures, Menu.Documents.EquationManager));
     }
 
     public static string SelectTopic(string category)
     {
         string[] topics = category switch
         {
-            Menu.Sketches => new[] { Menu.Line, Menu.Point, Menu.CenterLine, Menu.Rectangle },
+            Menu.Documents.Sketches => new[] { Menu.SketchArticles.Line, Menu.SketchArticles.Point, Menu.SketchArticles.CenterLine, Menu.SketchArticles.Rectangle },
             _ => Array.Empty<string>()
         };
 
         return AnsiConsole.Prompt(
             new SelectionPrompt<string>()
-                .Title($"[yellow]{Menu.TopicPrompt}[/]")
+                .Title($"[yellow]{Menu.Prompts.TopicPrompt}[/]")
                 .AddChoices(topics));
     }
 
@@ -33,14 +33,14 @@ public static class MenuBuilder
     {
         string[] variants = topic switch
         {
-            Menu.Line => new[] { Menu.Create, Menu.Edit },
-            Menu.Point => new[] { Menu.Create },
+            Menu.SketchArticles.Line => new[] { Menu.ArticleTypes.Create, Menu.ArticleTypes.Edit },
+            Menu.SketchArticles.Point => new[] { Menu.ArticleTypes.Create },
             _ => Array.Empty<string>()
         };
 
         return AnsiConsole.Prompt(
             new SelectionPrompt<string>()
-                .Title($"[yellow]{Menu.VariantPrompt}[/]")
+                .Title($"[yellow]{Menu.Prompts.VariantPrompt}[/]")
                 .AddChoices(variants));
     }
 }

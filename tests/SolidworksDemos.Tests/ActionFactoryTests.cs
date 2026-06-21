@@ -1,8 +1,6 @@
-using System;
-using SolidworksDemos;
-using SolidworksDemos.Abstractions;
 using SolidworksDemos.Constants;
 using SolidworksDemos.Sketches;
+using System;
 using Xunit;
 
 namespace SolidworksDemos.Tests;
@@ -12,7 +10,7 @@ public class ActionFactoryTests
     [Fact]
     public void Create_SketchesLineCreate_ReturnsCreateLine()
     {
-        var action = ActionFactory.Create(Menu.Sketches, Menu.Line, Menu.Create);
+        var action = ActionFactory.Create(Menu.Documents.Sketches, Menu.SketchArticles.Line, Menu.ArticleTypes.Create);
 
         Assert.IsType<CreateLine>(action);
     }
@@ -20,7 +18,7 @@ public class ActionFactoryTests
     [Fact]
     public void Create_SketchesLineEdit_ReturnsEditSketchLine()
     {
-        var action = ActionFactory.Create(Menu.Sketches, Menu.Line, Menu.Edit);
+        var action = ActionFactory.Create(Menu.Documents.Sketches, Menu.SketchArticles.Line, Menu.ArticleTypes.Edit);
 
         Assert.IsType<EditSketchLine>(action);
     }

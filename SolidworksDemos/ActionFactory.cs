@@ -1,6 +1,6 @@
 using System;
-using SolidworksDemos.Abstractions;
 using SolidworksDemos.Constants;
+using SolidworksDemos.Interfaces;
 
 namespace SolidworksDemos;
 
@@ -10,8 +10,8 @@ public static class ActionFactory
     {
         return (category, topic, variant) switch
         {
-            (Menu.Sketches, Menu.Line, Menu.Create) => new Sketches.CreateLine(new Helpers.SwHelper()),
-            (Menu.Sketches, Menu.Line, Menu.Edit) => new Sketches.EditSketchLine(new Helpers.SwHelper()),
+            (Menu.Documents.Sketches, Menu.SketchArticles.Line, Menu.ArticleTypes.Create) => new Sketches.CreateLine(new Helpers.SwHelper()),
+            (Menu.Documents.Sketches, Menu.SketchArticles.Line, Menu.ArticleTypes.Edit) => new Sketches.EditSketchLine(new Helpers.SwHelper()),
             _ => throw new NotSupportedException($"No action for {category} > {topic} > {variant}")
         };
     }

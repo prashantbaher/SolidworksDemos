@@ -1,7 +1,7 @@
 using Spectre.Console;
 using SldWorks;
-using SolidworksDemos.Abstractions;
 using SolidworksDemos.Constants;
+using SolidworksDemos.Constants.Sketches;
 using SolidworksDemos.Helpers;
 using SolidworksDemos.Interfaces;
 using SolidworksDemos.Models;
@@ -12,10 +12,6 @@ public class CreateLine : ICrudAction
 {
     private readonly ISwHelper _swHelper;
 
-    public CreateLine() : this(new SwHelper())
-    {
-    }
-
     public CreateLine(ISwHelper swHelper)
     {
         _swHelper = swHelper;
@@ -23,14 +19,14 @@ public class CreateLine : ICrudAction
 
     public void Execute()
     {
-        double startX = AnsiConsole.Ask<double>("Enter Start Point [green]X[/] (mm):");
-        double startY = AnsiConsole.Ask<double>("Enter Start Point [green]Y[/] (mm):");
-        double endX = AnsiConsole.Ask<double>("Enter End Point [green]X[/] (mm):");
-        double endY = AnsiConsole.Ask<double>("Enter End Point [green]Y[/] (mm):");
+        double startX = AnsiConsole.Ask<double>(LineMessages.Prompts.StartPointX);
+        double startY = AnsiConsole.Ask<double>(LineMessages.Prompts.StartPointY);
+        double endX = AnsiConsole.Ask<double>(LineMessages.Prompts.EndPointX);
+        double endY = AnsiConsole.Ask<double>(LineMessages.Prompts.EndPointY);
 
         var startPt = new PointViewModel
         {
-            Header = "Start Point",
+            Header = LineMessages.Headers.StartPoint,
             XPoint = startX,
             YPoint = startY,
             ZPoint = 0
@@ -38,7 +34,7 @@ public class CreateLine : ICrudAction
 
         var endPt = new PointViewModel
         {
-            Header = "End Point",
+            Header = LineMessages.Headers.EndPoint,
             XPoint = endX,
             YPoint = endY,
             ZPoint = 0
@@ -47,7 +43,7 @@ public class CreateLine : ICrudAction
         string result = "";
 
         AnsiConsole.Status()
-            .Start(Menu.ProcessingMessage, ctx =>
+            .Start(Menu.Messages.ProcessingMessage, ctx =>
             {
                 result = RunCreateLine(startPt, endPt);
             });
@@ -59,16 +55,16 @@ public class CreateLine : ICrudAction
     {
         SldWorks.SldWorks swApp = _swHelper.CreateSwInstance();
         if (swApp == null)
-            return "[red]Failed to find SolidWorks application.[/]";
+            return LineMessages.Results.SwAppNotFound;
 
         ModelDoc2 swDoc = _swHelper.CreatePartDocument(swApp);
         if (swDoc == null)
-            return "[red]Failed to create new part document.[/]";
+            return LineMessages.Results.CreatePartFailed;
 
         if (!_swHelper.SelectPlaneAndInsertSketch(swDoc))
         {
             _swHelper.CleanupAndExit(swApp);
-            return "[red]Failed to select Right Plane.[/]";
+            return LineMessages.Results.SelectPlaneFailed;
         }
 
         double factor = _swHelper.GetLengthConversionFactor(swDoc);
@@ -79,12 +75,12 @@ public class CreateLine : ICrudAction
         if (segment == null)
         {
             _swHelper.CleanupAndExit(swApp);
-            return "[red]Failed to create sketch line.[/]";
+            return LineMessages.Results.CreateLineFailed;
         }
 
         swDoc.ClearSelection2(true);
         swDoc.ViewZoomtofit2();
 
-        return "[green]Sketch line successfully created.[/]";
+        return LineMessages.Results.LineCreated;
     }
 }

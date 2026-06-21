@@ -1,8 +1,8 @@
 using Spectre.Console;
 using SldWorks;
 using SwConst;
-using SolidworksDemos.Abstractions;
 using SolidworksDemos.Constants;
+using SolidworksDemos.Constants.Sketches;
 using SolidworksDemos.Helpers;
 using SolidworksDemos.Interfaces;
 using SolidworksDemos.Models;
@@ -13,10 +13,6 @@ public class EditSketchLine : ICrudAction
 {
     private readonly ISwHelper _swHelper;
 
-    public EditSketchLine() : this(new SwHelper())
-    {
-    }
-
     public EditSketchLine(ISwHelper swHelper)
     {
         _swHelper = swHelper;
@@ -26,28 +22,28 @@ public class EditSketchLine : ICrudAction
     {
         string mode = AnsiConsole.Prompt(
             new SelectionPrompt<string>()
-                .Title("Select [green]edit mode[/]")
-                .AddChoices("New SW Instance", "Running SW Instance"));
+                .Title(LineMessages.Prompts.EditMode)
+                .AddChoices(LineMessages.Prompts.NewSwInstance, LineMessages.Prompts.RunningSwInstance));
 
-        if (mode == "New SW Instance")
+        if (mode == LineMessages.Prompts.NewSwInstance)
         {
-            double startX = AnsiConsole.Ask<double>("Enter Start Point [green]X[/] (mm):");
-            double startY = AnsiConsole.Ask<double>("Enter Start Point [green]Y[/] (mm):");
-            double endX = AnsiConsole.Ask<double>("Enter End Point [green]X[/] (mm):");
-            double endY = AnsiConsole.Ask<double>("Enter End Point [green]Y[/] (mm):");
+            double startX = AnsiConsole.Ask<double>(LineMessages.Prompts.StartPointX);
+            double startY = AnsiConsole.Ask<double>(LineMessages.Prompts.StartPointY);
+            double endX = AnsiConsole.Ask<double>(LineMessages.Prompts.EndPointX);
+            double endY = AnsiConsole.Ask<double>(LineMessages.Prompts.EndPointY);
 
-            double newStartX = AnsiConsole.Ask<double>("Enter New Start Point [green]X[/] (mm):");
-            double newStartY = AnsiConsole.Ask<double>("Enter New Start Point [green]Y[/] (mm):");
-            double newEndX = AnsiConsole.Ask<double>("Enter New End Point [green]X[/] (mm):");
-            double newEndY = AnsiConsole.Ask<double>("Enter New End Point [green]Y[/] (mm):");
+            double newStartX = AnsiConsole.Ask<double>(LineMessages.Prompts.NewStartPointX);
+            double newStartY = AnsiConsole.Ask<double>(LineMessages.Prompts.NewStartPointY);
+            double newEndX = AnsiConsole.Ask<double>(LineMessages.Prompts.NewEndPointX);
+            double newEndY = AnsiConsole.Ask<double>(LineMessages.Prompts.NewEndPointY);
 
-            var startPt = new PointViewModel { Header = "Start Point", XPoint = startX, YPoint = startY, ZPoint = 0 };
-            var endPt = new PointViewModel { Header = "End Point", XPoint = endX, YPoint = endY, ZPoint = 0 };
-            var newStartPt = new PointViewModel { Header = "New Start Point", XPoint = newStartX, YPoint = newStartY, ZPoint = 0 };
-            var newEndPt = new PointViewModel { Header = "New End Point", XPoint = newEndX, YPoint = newEndY, ZPoint = 0 };
+            var startPt = new PointViewModel { Header = LineMessages.Headers.StartPoint, XPoint = startX, YPoint = startY, ZPoint = 0 };
+            var endPt = new PointViewModel { Header = LineMessages.Headers.EndPoint, XPoint = endX, YPoint = endY, ZPoint = 0 };
+            var newStartPt = new PointViewModel { Header = LineMessages.Headers.NewStartPoint, XPoint = newStartX, YPoint = newStartY, ZPoint = 0 };
+            var newEndPt = new PointViewModel { Header = LineMessages.Headers.NewEndPoint, XPoint = newEndX, YPoint = newEndY, ZPoint = 0 };
 
             string result = "";
-            AnsiConsole.Status().Start(Menu.ProcessingMessage, ctx =>
+            AnsiConsole.Status().Start(Menu.Messages.ProcessingMessage, ctx =>
             {
                 result = RunEditSketchLineNewInstance(startPt, endPt, newStartPt, newEndPt);
             });
@@ -55,16 +51,16 @@ public class EditSketchLine : ICrudAction
         }
         else
         {
-            double newStartX = AnsiConsole.Ask<double>("Enter New Start Point [green]X[/] (mm):");
-            double newStartY = AnsiConsole.Ask<double>("Enter New Start Point [green]Y[/] (mm):");
-            double newEndX = AnsiConsole.Ask<double>("Enter New End Point [green]X[/] (mm):");
-            double newEndY = AnsiConsole.Ask<double>("Enter New End Point [green]Y[/] (mm):");
+            double newStartX = AnsiConsole.Ask<double>(LineMessages.Prompts.NewStartPointX);
+            double newStartY = AnsiConsole.Ask<double>(LineMessages.Prompts.NewStartPointY);
+            double newEndX = AnsiConsole.Ask<double>(LineMessages.Prompts.NewEndPointX);
+            double newEndY = AnsiConsole.Ask<double>(LineMessages.Prompts.NewEndPointY);
 
-            var newStartPt = new PointViewModel { Header = "New Start Point", XPoint = newStartX, YPoint = newStartY, ZPoint = 0 };
-            var newEndPt = new PointViewModel { Header = "New End Point", XPoint = newEndX, YPoint = newEndY, ZPoint = 0 };
+            var newStartPt = new PointViewModel { Header = LineMessages.Headers.NewStartPoint, XPoint = newStartX, YPoint = newStartY, ZPoint = 0 };
+            var newEndPt = new PointViewModel { Header = LineMessages.Headers.NewEndPoint, XPoint = newEndX, YPoint = newEndY, ZPoint = 0 };
 
             string result = "";
-            AnsiConsole.Status().Start(Menu.ProcessingMessage, ctx =>
+            AnsiConsole.Status().Start(Menu.Messages.ProcessingMessage, ctx =>
             {
                 result = RunEditSketchLineExistingInstance(newStartPt, newEndPt);
             });
@@ -78,19 +74,19 @@ public class EditSketchLine : ICrudAction
     {
         SldWorks.SldWorks swApp = _swHelper.CreateSwInstance();
         if (swApp == null)
-            return "[red]Failed to find SolidWorks application.[/]";
+            return LineMessages.Results.SwAppNotFound;
 
         ModelDoc2 swDoc = _swHelper.CreatePartDocument(swApp);
         if (swDoc == null)
         {
             _swHelper.CleanupAndExit(swApp);
-            return "[red]Failed to create new part document.[/]";
+            return LineMessages.Results.CreatePartFailed;
         }
 
         if (!_swHelper.SelectPlaneAndInsertSketch(swDoc))
         {
             _swHelper.CleanupAndExit(swApp);
-            return "[red]Failed to select Right Plane.[/]";
+            return LineMessages.Results.SelectPlaneFailed;
         }
 
         double factor = _swHelper.GetLengthConversionFactor(swDoc);
@@ -101,7 +97,7 @@ public class EditSketchLine : ICrudAction
         if (segment == null)
         {
             _swHelper.CleanupAndExit(swApp);
-            return "[red]Failed to create sketch line.[/]";
+            return LineMessages.Results.CreateLineFailed;
         }
 
         string result = EditLinePoints(swDoc, segment, newStartPt, newEndPt, factor);
@@ -114,22 +110,22 @@ public class EditSketchLine : ICrudAction
     {
         SldWorks.SldWorks swApp = _swHelper.ConnectToRunningInstance();
         if (swApp == null)
-            return "[red]No running SolidWorks instance found.[/]";
+            return LineMessages.Results.NoRunningSwInstance;
 
         ModelDoc2 swDoc = _swHelper.GetActiveDocument(swApp);
         if (swDoc == null)
-            return "[red]No active document open.[/]";
+            return LineMessages.Results.NoActiveDocument;
 
         if (swDoc.GetType() != (int)swDocumentTypes_e.swDocPART)
-            return "[red]Active document is not a part document.[/]";
+            return LineMessages.Results.NotPartDocument;
 
         Sketch activeSketch = swDoc.SketchManager.ActiveSketch;
         if (activeSketch == null)
-            return "[red]No active sketch found. Enter sketch mode first.[/]";
+            return LineMessages.Results.NoActiveSketch;
 
         object[] segments = (object[])activeSketch.GetSketchSegments();
         if (segments == null || segments.Length == 0)
-            return "[red]No sketch segments found.[/]";
+            return LineMessages.Results.NoSketchSegments;
 
         SketchSegment lineSegment = null;
         foreach (object seg in segments)
@@ -143,7 +139,7 @@ public class EditSketchLine : ICrudAction
         }
 
         if (lineSegment == null)
-            return "[red]No line found in the active sketch.[/]";
+            return LineMessages.Results.NoLineFound;
 
         double factor = _swHelper.GetLengthConversionFactor(swDoc);
         return EditLinePoints(swDoc, lineSegment, newStartPt, newEndPt, factor);
@@ -166,6 +162,6 @@ public class EditSketchLine : ICrudAction
         swDoc.ClearSelection2(true);
         swDoc.ViewZoomtofit2();
 
-        return "[green]Sketch line successfully edited.[/]";
+        return LineMessages.Results.LineEdited;
     }
 }

@@ -1,4 +1,4 @@
-namespace SolidworksDemos.Abstractions;
+namespace SolidworksDemos.Interfaces;
 
 public interface ICrudAction
 {
